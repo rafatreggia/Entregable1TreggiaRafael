@@ -35,8 +35,8 @@ function calcularMejorIntento(listadoDeNumeros, numeroSecreto) {
 
 function comenzarJuego() {
   const numeroSecreto = generarNumero(1, 100);
-  console.log(numeroSecreto);
-  const intentosMaximos = 5;
+  // console.log(numeroSecreto);
+  const intentosMaximos = 10;
   let intentosUsados = 0;
   let adivinado = false;
   let listadoDeNumeros = [];
