@@ -8,7 +8,7 @@
     <title>Adivina el Numero Correcto</title>
   </head>
   <body>
-    <h1>Juego de Adivinar el Número</h1>
+    <!-- <h1>Juego de Adivinar el Número</h1>
     <p>
       Este proyecto es un juego interactivo en JavaScript donde el objetivo es
       adivinar un número secreto generado aleatoriamente entre 1 y 100. Tienes
@@ -17,10 +17,43 @@
       que el número secreto. Además, el juego guarda todos los números que has
       ingresado y, si no logras acertar, te mostrará cuál fue tu intento más
       cercano al número secreto.¡Intenta ganar!
-    </p>
-    <p>
-      Toda la interacción se realiza en la <strong>Consola JS</strong>
-      y mediante cuadros de diálogo (prompt, confirm, alert).
-    </p>
+    </p> -->
+    <div class="container">
+      <h1>Adivina el Numero</h1>
+      <div class="game-info">
+        <div class="info-row">
+          <span class="label">Rango:</span>
+          <span class="value">1 - 100</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Intentos Restantes:</span>
+          <span class="value" id="intentos-restantes">10</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Intentos Usados:</span>
+          <span class="value" id="intentos-usados">0</span>
+        </div>
+      </div>
+      <div id="mensaje" class="mensaje"></div>
+      <div class="input-group">
+        <input
+          placeholder="Ingrese su Numero"
+          min="1"
+          max="100"
+          type="number"
+          id="numero-input"
+        />
+      </div>
+      <div>
+        <button class="btn btn-primary" id="btn-adivinar">Adivinar</button>
+        <button class="btn btn-secondary hidden" id="btn-reiniciar">
+          Reiniciar
+        </button>
+      </div>
+      <div class="historial">
+        <h3>Tus intentos:</h3>
+        <div class="historial-lista" id="historial-lista"></div>
+      </div>
+    </div>
   </body>
 </html>
