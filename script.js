@@ -16,7 +16,7 @@ let juegoActivo = {
   historialNumeros: [],
 };
 
-//Funciones de actualizacion del DOM
+//Funciones de actualización del DOM
 function mostrarMensaje(texto, tipo) {
   mensaje.textContent = texto;
   mensaje.className = `mensaje activo ${tipo}`;
@@ -42,18 +42,107 @@ function limpiarHistorial() {
   historialLista.innerHTML = "";
 }
 
-function terminarJuego() {
+function terminarJuego(mensajeFinal, tipo) {
   juegoActivo.activo = false;
   btnAdivinar.disabled = true;
   numeroInput.disabled = true;
   btnReiniciar.classList.remove("hidden");
-}
-//Logica Principal
-function iniciarJuego() {}
-function procesarIntento() {
-  console.log("se clickeo");
+  mostrarMensaje(mensajeFinal, tipo);
 }
 
+// 🔹 Generar número aleatorio
+function generarNumero(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// 🔹 Calcular el intento más cercano (cuando se pierde)
+function calcularMejorIntento(listadoDeNumeros, numeroSecreto) {
+  let mejorNumero = listadoDeNumeros[0];
+  let mejorDiferencia = Math.abs(mejorNumero - numeroSecreto);
+
+  for (let numero of listadoDeNumeros) {
+    let diferencia = Math.abs(numero - numeroSecreto);
+    if (diferencia < mejorDiferencia) {
+      mejorDiferencia = diferencia;
+      mejorNumero = numero;
+    }
+  }
+  return mejorNumero;
+}
+
+// 🔹 Iniciar/Reiniciar el juego
+function iniciarJuego() {
+  juegoActivo.numeroSecreto = generarNumero(1, 100);
+  juegoActivo.intentosUsados = 0;
+  juegoActivo.activo = true;
+  juegoActivo.historialNumeros = [];
+
+  numeroInput.value = "";
+  numeroInput.disabled = false;
+  btnAdivinar.disabled = false;
+  btnReiniciar.classList.add("hidden");
+
+  limpiarHistorial();
+  actualizarContador();
+  ocultarMensaje();
+
+  // Guardar estado inicial en localStorage
+  localStorage.setItem("historialNumeros", JSON.stringify([]));
+}
+
+// 🔹 Procesar intento
+function procesarIntento() {
+  if (!juegoActivo.activo) return;
+
+  const numeroIngresado = Number(numeroInput.value);
+
+  // Validación
+  if (
+    isNaN(numeroIngresado) ||
+    numeroIngresado < 1 ||
+    numeroIngresado > 100
+  ) {
+    mostrarMensaje("⚠️ Ingresa un número válido entre 1 y 100.", "error");
+    return;
+  }
+
+  juegoActivo.intentosUsados++;
+  juegoActivo.historialNumeros.push(numeroIngresado);
+  agregarNumeroAlHistorial(numeroIngresado);
+  actualizarContador();
+
+  // Guardar en localStorage
+  localStorage.setItem(
+    "historialNumeros",
+    JSON.stringify(juegoActivo.historialNumeros)
+  );
+
+  // Verificación
+  if (numeroIngresado === juegoActivo.numeroSecreto) {
+    terminarJuego(
+      `🎉 Ganaste! El número secreto era ${juegoActivo.numeroSecreto}. Lo lograste en ${juegoActivo.intentosUsados} intentos.`,
+      "exito"
+    );
+  } else if (juegoActivo.intentosUsados >= juegoActivo.intentosMaximos) {
+    let mejorIntento = calcularMejorIntento(
+      juegoActivo.historialNumeros,
+      juegoActivo.numeroSecreto
+    );
+    terminarJuego(
+      `❌ Perdiste! El número secreto era ${juegoActivo.numeroSecreto}. Tu intento más cercano fue ${mejorIntento}.`,
+      "error"
+    );
+  } else if (numeroIngresado < juegoActivo.numeroSecreto) {
+    mostrarMensaje("🔼 El número secreto es mayor.", "pista");
+  } else {
+    mostrarMensaje("🔽 El número secreto es menor.", "pista");
+  }
+
+  numeroInput.value = "";
+  numeroInput.focus();
+}
+
+// Eventos
 btnAdivinar.addEventListener("click", procesarIntento);
 btnReiniciar.addEventListener("click", iniciarJuego);
 numeroInput.addEventListener("keypress", (e) => {
@@ -61,7 +150,9 @@ numeroInput.addEventListener("keypress", (e) => {
     procesarIntento();
   }
 });
-iniciarJuego()
+
+// Iniciar por primera vez
+iniciarJuego();
 // function generarNumero(min, max) {
 //   let nuevoNumero = Math.floor(Math.random() * (max - min + 1)) + min;
 //   return nuevoNumero;
